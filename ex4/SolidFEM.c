@@ -147,6 +147,7 @@ void setTotalStiffnessMatrix(Mesh* _mesh)
         setStiffnessMatrix(&_mesh->tetrahedra[i]);
 
         //[TODO4]要素行列_mesh->tetrahedra[ i ].Kを足し込み，全体剛性行列_mesh->Kを生成する
+        _mesh->tetrahedra[i].K.X[12 * (3 * j + l) + 3 * k + m]++;
     }
 }
 
