@@ -1,5 +1,4 @@
 #include "SolidFEM.h"
-#include "MathTool.h"
 
 void setMaterialProperty(Mesh* _mesh, double _poisson_ratio, double _young_modulus)
 {
@@ -31,6 +30,7 @@ void calStrain(Tetrahedra* _tetrahedra)
 {
     //[TODO2]_tetrahedra->Bと_tetrahedra->deformationから_tetrahedra->strainを計算する
     // ヒント：行列とベクトルの積には関数multiMatandVecNを使用する
+
     multiMatandVecN(&_tetrahedra->B, &_tetrahedra->deformation, &_tetrahedra->strain);
 }
 
@@ -145,21 +145,8 @@ void setTotalStiffnessMatrix(Mesh* _mesh)
         setStrainDeformationMatrix(&_mesh->tetrahedra[i]);
         setStressStrainMatrix(&_mesh->tetrahedra[i]);
         setStiffnessMatrix(&_mesh->tetrahedra[i]);
-    }
 
-    //[TODO4]要素行列_mesh->tetrahedra[ i ].Kを足し込み，全体剛性行列_mesh->Kを生成する
-    col = _mesh->K.ncol;
-    row = _mesh->K.nrow;
-    for (i = 0; i < _mesh->num_tetrahedra; i++) {
-        for (j = 0; j < 4; j++) {
-            for (k = 0; k < 4; k++) {
-                for (l = 0; l < 3; l++) {
-                    for (m = 0; m < 3; m++) {
-                        _mesh->K.X[col * (3 * _mesh->tetrahedra[i].node_index[j] + l) + 3 * _mesh->tetrahedra[i].node_index[k] + m] += _mesh->tetrahedra[i].K.X[12 * (3 * j + l) + 3 * k + m];
-                    }
-                }
-            }
-        }
+        //[TODO4]要素行列_mesh->tetrahedra[ i ].Kを足し込み，全体剛性行列_mesh->Kを生成する
     }
 }
 

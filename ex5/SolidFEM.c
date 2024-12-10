@@ -1,5 +1,6 @@
 #include "SolidFEM.h"
 #include "MathTool.h"
+#include <math.h>
 
 void setMaterialProperty(Mesh* _mesh, double _poisson_ratio, double _young_modulus)
 {
@@ -45,6 +46,7 @@ double calMisesStress(Tetrahedra* _tetrahedra)
 {
     calStress(_tetrahedra);
     //[TODO5]_tetrahedra->mises_stressにミーゼス応力の計算結果を格納する
+    _tetrahedra->mises_stress = sqrt(0.5 * (pow(_tetrahedra->stress.X[0] - _tetrahedra->stress.X[1], 2) + pow(_tetrahedra->stress.X[1] - _tetrahedra->stress.X[2], 2) + pow(_tetrahedra->stress.X[2] - _tetrahedra->stress.X[0], 2) + 3 * 2 * (pow(_tetrahedra->stress.X[3], 2) + pow(_tetrahedra->stress.X[4], 2) + pow(_tetrahedra->stress.X[5], 2))));
     return _tetrahedra->mises_stress;
 }
 

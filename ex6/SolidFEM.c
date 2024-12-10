@@ -1,5 +1,6 @@
 #include "SolidFEM.h"
 #include "MathTool.h"
+#include <math.h>
 
 void setMaterialProperty(Mesh* _mesh, double _poisson_ratio, double _young_modulus)
 {
@@ -45,6 +46,7 @@ double calMisesStress(Tetrahedra* _tetrahedra)
 {
     calStress(_tetrahedra);
     //[TODO5]_tetrahedra->mises_stressにミーゼス応力の計算結果を格納する
+    _tetrahedra->mises_stress = sqrt(0.5 * (pow(_tetrahedra->stress.X[0] - _tetrahedra->stress.X[1], 2) + pow(_tetrahedra->stress.X[1] - _tetrahedra->stress.X[2], 2) + pow(_tetrahedra->stress.X[2] - _tetrahedra->stress.X[0], 2) + 3 * 2 * (pow(_tetrahedra->stress.X[3], 2) + pow(_tetrahedra->stress.X[4], 2) + pow(_tetrahedra->stress.X[5], 2))));
     return _tetrahedra->mises_stress;
 }
 
@@ -344,7 +346,13 @@ int saveDF(Mesh* _mesh, const char* _filename)
 
     //[TODO6]
     // 全体変位ベクトル_mesh->deformationと全体剛性行列_mesh->Kから全体力ベクトル_mesh->forceを計算
+    multiMatandVecN(&_mesh->K, &_mesh->deformation, &_mesh->force);
     // ファイルfileに節点番号，節点3次元座標，節点3次元変位，節点3次元力を出力する
+    for (i = 0; i < _mesh->num_node; i++)
+        fprintf(file, "%d,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+            i, _mesh->node[i].new_position.X[0], _mesh->node[i].new_position.X[1], _mesh->node[i].new_position.X[2], _mesh->deformation.X[3 * i + 0], _mesh->deformation.X[3 * i + 1], _mesh->deformation.X[3 * i + 2], _mesh->force.X[3 * i + 0], _mesh->force.X[3 * i + 1], _mesh->force.X[3 * i + 2]);
+    fclose(file);
+    return 1;
 
     fclose(file);
     return 1;
