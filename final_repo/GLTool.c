@@ -1,4 +1,9 @@
 #include "GLTool.h"
+#include "MathTool.h"
+#include "Mesh.h"
+#include <GLUT/glut.h>
+#include <OpenGL/gl.h>
+#include <math.h>
 
 void calColorMap(double _value, Vec3d* _color)
 {
@@ -202,4 +207,51 @@ void setMouseRotation(double _x, double _y, Matd* _dst)
 void setMouseScroll(double _s, Matd* _dst)
 {
     _dst->X[0] = _dst->X[5] = _dst->X[10] = _s;
+}
+
+void drawdeformationArrow(Mesh* _mesh)
+{
+
+    glLineWidth(1.0);
+
+    glColor3f(1.0, 0.0, 0.0);
+
+    glBegin(GL_LINES);
+    for (int i = 0; i < _mesh->num_node; i++) {
+        // 元の節点位置
+        double x0 = _mesh->node[i].position.x;
+        double y0 = _mesh->node[i].position.y;
+        double z0 = _mesh->node[i].position.z;
+
+        // 変位後の節点位置
+        double x1 = x0 + _mesh->deformation.X[3 * i];
+        double y1 = y0 + _mesh->deformation.X[3 * i + 1];
+        double z1 = z0 + _mesh->deformation.X[3 * i + 2];
+
+        glVertex3f(x0, y0, z0);  // 始点
+        glVertex3f(x1, y1, z1);  // 終点
+    }
+    glEnd();
+
+    // 矢印の三角形を描く
+    for (int i = 0; i < _mesh->num_node; i++) {
+        // 元の節点位置
+        double x0 = _mesh->node[i].position.x;
+        double y0 = _mesh->node[i].position.y;
+        double z0 = _mesh->node[i].position.z;
+
+        // 変位後の節点位置
+        double x1 = x0 + _mesh->deformation.X[3 * i];
+        double y1 = y0 + _mesh->deformation.X[3 * i + 1];
+        double z1 = z0 + _mesh->deformation.X[3 * i + 2];
+        glPushMatrix();
+        glTranslated(x1, y1, z1);
+        if (x1 != x0 || y1 != y0 || z1 != z0) {
+            glRotated(atan2(z1 - z0, y1 - y0) * M_PI, 1, 0, 0);
+            glRotated(atan2(x1 - x0, z1 - z0) * M_PI, 0, 1, 0);
+            glRotated(atan2(y1 - y0, x1 - x0) * M_PI, 0, 0, 1);
+        }
+        glutSolidCone(0.5, 3, 5, 5);
+        glPopMatrix();
+    }
 }

@@ -31,4 +31,6 @@ void setMouseRotation( double _x, double _y, Matd *_dst );
 //拡大縮小変換行列の設定
 void setMouseScroll( double _s, Matd *_dst);
 
+void drawdeformationArrow(Mesh* _mesh);
+
 #endif
